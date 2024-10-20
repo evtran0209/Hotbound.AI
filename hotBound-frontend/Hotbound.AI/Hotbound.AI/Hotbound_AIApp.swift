@@ -11,7 +11,7 @@ import SwiftUI
 struct Hotbound_AIApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainView()
         }
     }
 }

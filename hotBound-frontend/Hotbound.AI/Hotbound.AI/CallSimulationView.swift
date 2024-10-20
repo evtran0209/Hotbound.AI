@@ -7,56 +7,144 @@
 
 import SwiftUI
 
-struct ContextInputView: View {
+struct CallSimulationView: View {
     @Binding var currentPage: Int
-    @State private var isRecording = false
-    @State private var transcript = ""
+    @State private var isCallActive = false
+    @State private var showingPersonaNotes = false
+    @State private var aiResponse = ""
+    @State private var userInput = ""
+    @State private var conversationHistory: [Message] = []
+    @State private var showError = false
+    @State private var errorMessage = ""
     
     var body: some View {
         VStack {
-            Text("Building your prospect")
-                .font(.title)
-                .padding()
-            
-            Text("Tell me more...")
-                .font(.headline)
-            
-            Button(action: {
-                isRecording.toggle()
-                // TODO: Implement Deepgram recording and transcription
-            }) {
-                Image(systemName: isRecording ? "stop.circle.fill" : "mic.circle.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(isRecording ? .red : .blue)
-            }
-            .padding()
-            
-            Text("Transcript:")
-                .font(.headline)
-            
-            ScrollView {
-                Text(transcript)
+            if isCallActive {
+                VStack {
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            isCallActive = false
+                            currentPage = 0
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 30))
+                                .foregroundColor(.red)
+                        }
+                    }
                     .padding()
+                    
+                    ScrollView {
+                        LazyVStack {
+                            ForEach(conversationHistory, id: \.id) { message in
+                                MessageBubble(message: message)
+                            }
+                        }
+                    }
+                    
+                    HStack {
+                        TextField("Type your message...", text: $userInput)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        
+                        Button(action: sendMessage) {
+                            Image(systemName: "paperplane.fill")
+                        }
+                    }
+                    .padding()
+                    
+                    Button("Show Persona Notes") {
+                        showingPersonaNotes = true
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .sheet(isPresented: $showingPersonaNotes) {
+                    PersonaNotesView()
+                }
+            } else {
+                Text("Press to start call")
+                    .font(.title)
+                    .padding()
+                
+                Button(action: {
+                    isCallActive = true
+                }) {
+                    Image(systemName: "phone.circle.fill")
+                        .font(.system(size: 100))
+                        .foregroundColor(.green)
+                }
             }
-            .frame(height: 200)
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(10)
-            .padding()
-            
-            Button("Continue") {
-                currentPage += 1
+        }
+        .alert(isPresented: $showError) {
+            Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+        }
+    }
+    
+    private func sendMessage() {
+        guard !userInput.isEmpty else { return }
+        
+        let userMessage = Message(content: userInput, isUser: true)
+        conversationHistory.append(userMessage)
+        
+        let history = conversationHistory.map { $0.content }.joined(separator: "\n")
+        
+        APIService.shared.simulateConversation(userInput: userInput, conversationHistory: history) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let aiResponse):
+                    let aiMessage = Message(content: aiResponse, isUser: false)
+                    self.conversationHistory.append(aiMessage)
+                case .failure(let error):
+                    self.errorMessage = error.localizedDescription
+                    self.showError = true
+                }
+                self.userInput = ""
             }
-            .padding()
-            .background(Color.green)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            .disabled(transcript.isEmpty)
         }
     }
 }
 
-struct ContextInputView_Previews: PreviewProvider {
+struct Message: Identifiable {
+    let id = UUID()
+    let content: String
+    let isUser: Bool
+}
+
+struct MessageBubble: View {
+    let message: Message
+    
+    var body: some View {
+        HStack {
+            if message.isUser { Spacer() }
+            Text(message.content)
+                .padding()
+                .background(message.isUser ? Color.blue : Color.gray)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+            if !message.isUser { Spacer() }
+        }
+        .padding(.horizontal)
+    }
+}
+
+struct PersonaNotesView: View {
+    var body: some View {
+        VStack {
+            Text("Prospect Persona Notes:")
+                .font(.title)
+                .padding()
+            
+            // TODO: Implement dynamic persona notes
+            Text("Persona details will appear here")
+                .padding()
+        }
+    }
+}
+
+struct CallSimulationView_Previews: PreviewProvider {
     static var previews: some View {
-        ContextInputView(currentPage: .constant(1))
+        CallSimulationView(currentPage: .constant(2))
     }
 }

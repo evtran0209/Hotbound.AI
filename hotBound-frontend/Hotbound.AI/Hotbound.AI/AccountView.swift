@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct AccountView: View {
-    @State private var name = "Jenny Jenkins"
-    @State private var role = "High Ticket Sales Person"
-    @State private var experienceLevel = "3-5 yrs"
+    @State private var name = "Name: Jenny Jenkins"
+    @State private var role = "Job Role: High Ticket Sales Person"
+    @State private var experienceLevel = "Experience Level: 3-5 yrs"
     @State private var productSelling = "Enterprise Marketing Automation Tool"
 
     var body: some View {
@@ -28,11 +28,5 @@ struct AccountView: View {
             }
             .navigationTitle("Account")
         }
-    }
-}
-
-struct AccountView_Previews: PreviewProvider {
-    static var previews: some View {
-        AccountView()
     }
 }

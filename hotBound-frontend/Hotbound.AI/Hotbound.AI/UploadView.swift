@@ -12,19 +12,16 @@ struct UploadView: View {
     @State private var profileImages: [UIImage] = []
     @State private var isAnalyzing = false
     @State private var analysisResult = ""
+    @State private var showImagePicker = false
+    @State private var inputImage: UIImage?
+    @State private var showError = false
+    @State private var errorMessage = ""
     
     var body: some View {
         VStack {
-            Text("What sales calls are we preparing for?")
+            Text("Upload LinkedIn Profile")
                 .font(.title)
                 .padding()
-            
-            Text("Who is the prospect?")
-                .font(.headline)
-            
-            Text("Upload their profile screenshots!")
-                .font(.subheadline)
-                .foregroundColor(.gray)
             
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
                 ForEach(0..<4) { index in
@@ -36,12 +33,12 @@ struct UploadView: View {
                             .cornerRadius(10)
                     } else {
                         Button(action: {
-                            // TODO: Implement image picker
+                            showImagePicker = true
                         }) {
                             VStack {
-                                Image(systemName: "arrow.up.circle")
+                                Image(systemName: "plus")
                                     .font(.system(size: 40))
-                                Text("Screenshot \(index + 1)")
+                                Text("Add Image")
                             }
                         }
                         .frame(height: 150)
@@ -88,15 +85,33 @@ struct UploadView: View {
             .cornerRadius(10)
             .disabled(analysisResult.isEmpty)
         }
+        .sheet(isPresented: $showImagePicker, onDismiss: loadImage) {
+            ImagePicker(image: $inputImage)
+        }
+        .alert(isPresented: $showError) {
+            Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+        }
+    }
+    
+    private func loadImage() {
+        guard let inputImage = inputImage else { return }
+        profileImages.append(inputImage)
+        self.inputImage = nil
     }
     
     private func analyzeProfile() {
         isAnalyzing = true
-        // TODO: Implement profile analysis using Gemini 1.5 Pro
-        // This will involve sending the images to your backend for processing
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            analysisResult = "Profile analysis result will appear here."
-            isAnalyzing = false
+        APIService.shared.analyzeProfile(images: profileImages) { result in
+            DispatchQueue.main.async {
+                self.isAnalyzing = false
+                switch result {
+                case .success(let analysis):
+                    self.analysisResult = analysis
+                case .failure(let error):
+                    self.errorMessage = error.localizedDescription
+                    self.showError = true
+                }
+            }
         }
     }
 }
