@@ -23,31 +23,7 @@ Our AI-powered system analyzes individual performance data to identify specific 
 
 
 ## File Structure
-iOS App
-│
-├── Frontend
-│   └── Swift UI
-│       ├── Navigation Stack
-│       ├── Profile Upload
-│       ├── Context Input
-│       └── Call Simulation UI
-│
-├── Backend
-│   └── Cursor
-│       └── Data Management
-│
-├── AI and Machine Learning
-│   ├── Gemini 1.5
-│       └── LinkedIn Profile Analysis
-│           └── Persona Creation
-│
-├── Voice Processing
-│   ├── Deepgram
-│   │   ├── Real-time Voice Transcription
-│   │   └── User Input Processing
-│   └── Vapi.ai
-│       ├── Voice Response Generation
-│       └── AI Voice Generation
+<img width="327" alt="Screenshot 2024-10-20 at 10 51 32 AM" src="https://github.com/user-attachments/assets/9b5d0bd7-06a8-44f4-be74-c678fd48ad16">
 
 
 ## Schematic of Architecture
