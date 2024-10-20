@@ -1,4 +1,4 @@
-from vapi_python import Vapi
+#from vapi_python import Vapi
 import os
 from dotenv import load_dotenv
 
@@ -21,4 +21,4 @@ class VapiManager:
             return response.content
         except Exception as e:
             print(f"Error generating voice response: {e}")
-            return None
+            return None 
