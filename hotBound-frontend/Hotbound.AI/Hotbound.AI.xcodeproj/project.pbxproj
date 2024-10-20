@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		456A78F32CC4A8180000180F /* Vapi in Frameworks */ = {isa = PBXBuildFile; productRef = 456A78F22CC4A8180000180F /* Vapi */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		456A78CB2CC4583B0000180F /* Hotbound.AI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hotbound.AI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				456A78F32CC4A8180000180F /* Vapi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = Hotbound.AI;
 			packageProductDependencies = (
+				456A78F22CC4A8180000180F /* Vapi */,
 			);
 			productName = Hotbound.AI;
 			productReference = 456A78CB2CC4583B0000180F /* Hotbound.AI.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = 456A78C22CC4583B0000180F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				456A78F12CC4A8180000180F /* XCRemoteSwiftPackageReference "ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 456A78CC2CC4583B0000180F /* Products */;
 			projectDirPath = "";
@@ -324,6 +333,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		456A78F12CC4A8180000180F /* XCRemoteSwiftPackageReference "ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/VapiAI/ios";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		456A78F22CC4A8180000180F /* Vapi */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 456A78F12CC4A8180000180F /* XCRemoteSwiftPackageReference "ios" */;
+			productName = Vapi;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 456A78C32CC4583B0000180F /* Project object */;
 }

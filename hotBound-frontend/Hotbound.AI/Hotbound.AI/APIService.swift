@@ -6,142 +6,174 @@
 //
 
 import Foundation
+import Vapi
 
 class APIService {
     static let shared = APIService()
-    private let baseURL = "http://127.0.0.1:5000" // Update this with your backend URL when deployed
-    
-    private init() {}
-    
-    func analyzeProfile(images: [UIImage], completion: @escaping (Result<String, Error>) -> Void) {
-        let url = URL(string: "\(baseURL)/analyze_profile")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        let boundary = UUID().uuidString
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        
-        let body = NSMutableData()
-        
-        for (index, image) in images.enumerated() {
-            body.append("--\(boundary)\r\n")
-            body.append("Content-Disposition: form-data; name=\"images\"; filename=\"image\(index).jpg\"\r\n")
-            body.append("Content-Type: image/jpeg\r\n\r\n")
-            body.append(image.jpegData(compressionQuality: 0.8)!)
-            body.append("\r\n")
-        }
-        
-        body.append("--\(boundary)--\r\n")
-        request.httpBody = body as Data
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            
-            guard let data = data else {
-                completion(.failure(NSError(domain: "APIService", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
-                return
-            }
-            
-            do {
-                let json = try JSONDecoder().decode([String: String].self, from: data)
-                if let analysis = json["analysis"] {
-                    completion(.success(analysis))
-                } else {
-                    completion(.failure(NSError(domain: "APIService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
-                }
-            } catch {
-                completion(.failure(error))
-            }
-        }.resume()
-    }
-    
-    func transcribeAudio(audioData: Data, completion: @escaping (Result<String, Error>) -> Void) {
-        let url = URL(string: "\(baseURL)/transcribe_audio")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        let boundary = UUID().uuidString
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        
-        let body = NSMutableData()
-        body.append("--\(boundary)\r\n")
-        body.append("Content-Disposition: form-data; name=\"audio\"; filename=\"audio.wav\"\r\n")
-        body.append("Content-Type: audio/wav\r\n\r\n")
-        body.append(audioData)
-        body.append("\r\n")
-        body.append("--\(boundary)--\r\n")
-        
-        request.httpBody = body as Data
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            
-            guard let data = data else {
-                completion(.failure(NSError(domain: "APIService", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
-                return
-            }
-            
-            do {
-                let json = try JSONDecoder().decode([String: String].self, from: data)
-                if let transcript = json["transcript"] {
-                    completion(.success(transcript))
-                } else {
-                    completion(.failure(NSError(domain: "APIService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
-                }
-            } catch {
-                completion(.failure(error))
-            }
-        }.resume()
-    }
-    
-    func simulateConversation(userInput: String, conversationHistory: String, completion: @escaping (Result<String, Error>) -> Void) {
-        let url = URL(string: "\(baseURL)/simulate_conversation")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let body: [String: Any] = [
-            "user_input": userInput,
-            "conversation_history": conversationHistory
-        ]
-        
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            
-            guard let data = data else {
-                completion(.failure(NSError(domain: "APIService", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
-                return
-            }
-            
-            do {
-                let json = try JSONDecoder().decode([String: String].self, from: data)
-                if let aiResponse = json["ai_response"] {
-                    completion(.success(aiResponse))
-                } else {
-                    completion(.failure(NSError(domain: "APIService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
-                }
-            } catch {
-                completion(.failure(error))
-            }
-        }.resume()
-    }
-}
+    private var vapiClient: Vapi?
 
-extension NSMutableData {
-    func append(_ string: String) {
-        if let data = string.data(using: .utf8) {
-            self.append(data)
+    private init() {
+        // Initialize Vapi client with the API key from Info.plist
+        if let apiKey = Bundle.main.infoDictionary?["VAPI_API_KEY"] as? String {
+            vapiClient = Vapi(publicKey: apiKey)
+        } else {
+            print("Error: Vapi API key not found in Info.plist.")
+        }
+
+        // Set up Vapi event listeners
+        setupVapiEventListeners()
+    }
+
+    // Set up event listeners for call and speech events
+    private func setupVapiEventListeners() {
+        guard let vapiClient = vapiClient else {
+            print("Error: Vapi client not initialized.")
+            return
+        }
+
+        // Listen for call start event
+        vapiClient.on("callDidStart") {
+            DispatchQueue.main.async {
+                print("Call started")
+                // Update UI to indicate call start (e.g., change button states)
+            }
+        }
+
+        // Listen for call end event
+        vapiClient.on("callDidEnd") {
+            DispatchQueue.main.async {
+                print("Call ended")
+                // Update UI to indicate call end
+            }
+        }
+
+        // Listen for speech start event
+        vapiClient.on("speech-start") {
+            DispatchQueue.main.async {
+                print("Assistant is speaking")
+                // Update UI to show that assistant is speaking
+            }
+        }
+
+        // Listen for speech end event
+        vapiClient.on("speech-end") {
+            DispatchQueue.main.async {
+                print("Assistant finished speaking")
+                // Update UI to show that assistant has stopped speaking
+            }
+        }
+
+        // Listen for message events (e.g., transcripts or function calls)
+        vapiClient.on("appMessageReceived") { msg, _ in
+            guard let message = msg as? [String: Any] else { return }
+
+            if let type = message["type"] as? String {
+                if type == "transcript" {
+                    handleTranscriptMessage(message)
+                } else if type == "function-call" {
+                    handleFunctionCallMessage(message)
+                }
+            }
+        }
+
+        // Listen for error events
+        vapiClient.on("error") { error in
+            DispatchQueue.main.async {
+                print("Error during call: \(error.localizedDescription)")
+                // Handle error UI updates
+            }
+        }
+    }
+
+    // Handle transcript messages
+    private func handleTranscriptMessage(_ message: [String: Any]) {
+        if let transcriptType = message["transcriptType"] as? String,
+           let text = message["text"] as? String {
+            DispatchQueue.main.async {
+                if transcriptType == "partial" {
+                    print("Partial transcript: \(text)")
+                    // Update UI with live partial transcript
+                } else if transcriptType == "final" {
+                    print("Final transcript: \(text)")
+                    // Update UI with final transcript
+                }
+            }
+        }
+    }
+
+    // Handle function call messages
+    private func handleFunctionCallMessage(_ message: [String: Any]) {
+        if let functionCall = message["functionCall"] as? [String: Any],
+           let functionName = functionCall["name"] as? String {
+
+            if functionName == "addTopping" {
+                if let parameters = functionCall["parameters"] as? [String: Any],
+                   let topping = parameters["topping"] as? String {
+                    print("Add topping: \(topping)")
+                    // Handle topping addition in the UI
+                }
+            } else if functionName == "goToCheckout" {
+                print("Redirecting to checkout...")
+                // Handle redirect to checkout in the UI
+            }
+        }
+    }
+
+    // Start a call using the assistant ID or assistant dictionary
+    func startCall(assistantId: String, assistantOverrides: [String: Any] = [:]) {
+        guard let vapiClient = vapiClient else {
+            print("Error: Vapi client not initialized.")
+            return
+        }
+
+        // Check if there's already an ongoing call
+        if vapiClient.isCallActive {
+            print("Error: There's already an ongoing call.")
+            return
+        }
+
+        // Start the call with the assistant ID and optional overrides
+        vapiClient.start(assistantId: assistantId, assistantOverrides: assistantOverrides) { result in
+            switch result {
+            case .success:
+                print("Call started successfully")
+            case .failure(let error):
+                print("Error starting call: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    // Stop the ongoing call
+    func stopCall() {
+        guard let vapiClient = vapiClient else {
+            print("Error: Vapi client not initialized.")
+            return
+        }
+
+        // Stop the ongoing call
+        vapiClient.stop { result in
+            switch result {
+            case .success:
+                print("Call stopped successfully")
+            case .failure(let error):
+                print("Error stopping call: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    // Mute or unmute the call
+    func setCallMuted(_ muted: Bool) {
+        guard let vapiClient = vapiClient else {
+            print("Error: Vapi client not initialized.")
+            return
+        }
+
+        vapiClient.setMuted(muted)
+
+        if muted {
+            print("Call muted")
+        } else {
+            print("Call unmuted")
         }
     }
 }
