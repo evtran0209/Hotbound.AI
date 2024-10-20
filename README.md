@@ -80,8 +80,6 @@ graph TD
    D2["Vapi.ai"]:::voiceComp
 
 
-
-
    %% Backend Components
    F1["Cursor"]:::backendComp
    F2["Data Management"]:::backendComp
@@ -108,9 +106,6 @@ graph TD
    D --> D2
 
 
-   E --> E1
-
-
    F --> F1
    F --> F2
 
@@ -122,8 +117,6 @@ graph TD
    D1 --> |"Real-time Voice Transcription"| D1a["User Input Processing"]:::subComp
    D2 --> |"Voice Response Generation"| D2a["AI Voice Generation"]:::subComp
 
-
-   E1 --> |"Context Integration"| E1a["Dynamic Context Handling"]:::subComp
 
 
    %% Styling
