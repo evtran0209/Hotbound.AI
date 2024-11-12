@@ -55,7 +55,7 @@ graph TD
 
    %% Backend Components
    F1["Flask"]:::backendComp
-   F2["Data Management: ChromaDB"]:::backendComp
+   F2["Vector Database: ChromaDB"]:::backendComp
 
 
    %% Connections
