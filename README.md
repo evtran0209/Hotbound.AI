@@ -58,8 +58,8 @@ graph TD
 
 
    %% Backend Components
-   F1["Cursor"]:::backendComp
-   F2["Data Management"]:::backendComp
+   F1["Flask"]:::backendComp
+   F2["Data Management: ChromaDB"]:::backendComp
 
 
    %% Connections
