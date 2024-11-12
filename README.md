@@ -1,6 +1,6 @@
 # Hotbound.AI
 
-# Hotbound.ai Tech Stack Explanation & Schema
+# Hotbound AI Tech Stack Explanation & Schema
 
 
 ## Company Overview
