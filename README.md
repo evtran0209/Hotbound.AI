@@ -23,10 +23,6 @@ Our AI-powered system analyzes individual performance data to identify specific 
     ii. Vapi.ai for AI voice response generation
 
 
-## File Structure
-<img width="327" alt="Screenshot 2024-10-20 at 10 51 32 AM" src="https://github.com/user-attachments/assets/9b5d0bd7-06a8-44f4-be74-c678fd48ad16">
-
-
 ## Schematic of Architecture
 ```mermaid
 graph TD
