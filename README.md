@@ -14,10 +14,11 @@ Our AI-powered system analyzes individual performance data to identify specific 
     i. Swift UI for iOS app development
     ii. NavigationStack for app navigation
 2. Backend:
-    i. Cursor for Python-based backend services
-3. AI and Machine Learning:
+    i. 
+   ii. ChromaDB for Vector Database
+4. AI and Machine Learning:
     i. Gemini 1.5 for LinkedIn profile analysis
-4. Voice Processing:
+5. Voice Processing:
     i. Deepgram for real-time voice transcription
     ii. Vapi.ai for AI voice response generation
 
