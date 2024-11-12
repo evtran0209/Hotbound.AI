@@ -14,7 +14,7 @@ Our AI-powered system analyzes individual performance data to identify specific 
     i. Swift UI for iOS app development
     ii. NavigationStack for app navigation
 2. Backend:
-    i. 
+    i. Flask
    ii. ChromaDB for Vector Database
 4. AI and Machine Learning:
     i. Gemini 1.5 for LinkedIn profile analysis
